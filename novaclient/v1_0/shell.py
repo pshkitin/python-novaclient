@@ -779,3 +779,27 @@ def _find_flavor(cs, flavor):
         return utils.find_resource(cs.flavors, flavor)
     except exceptions.NotFound:
         return cs.flavors.find(ram=flavor)
+
+@utils.arg('name', metavar='<name>', help='Name of key.')
+@utils.arg('--pub-key', metavar='<pub-key>', help='Public key if exists.', default=None)
+def do_add_keypair(cs, args):
+    """Creates a new key pair for use with instances"""
+    name = args.name
+    pub_key = args.pub_key
+    keypair = cs.keypairs.create(name, pub_key)
+
+    if not pub_key:
+        private_key = keypair.private_key
+        print private_key
+
+@utils.arg('name', metavar='<name>', help='Keypair name to delete.')
+def do_delete_keypair(cs, args):
+    """Deletes keypair by its id"""
+    name = args.name
+    cs.keypairs.delete(name)
+
+def do_show_user_keypairs(cs, args):
+    """Returns list of keypair for a user"""
+    keypairs = cs.keypairs.list()
+    columns = ['Name', 'Fingerprint']
+    utils.print_list(keypairs, columns)
